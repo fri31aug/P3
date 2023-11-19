@@ -1,6 +1,6 @@
 #!/bin/bash
-export Your_Name="Chang Guo"
-export ASU_ID="0123456789"
+export Your_Name="Ananya Yadav"
+export ASU_ID="1223387867"
 
 message="[CSE330][Fall2023][Project-3][ASUID:$ASU_ID][$Your_Name]"
 
