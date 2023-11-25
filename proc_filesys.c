@@ -16,7 +16,7 @@ static ssize_t write_to_kernel(struct file *file, const char __user *user_buffer
 
     // TODO 1: copy from the user buffer to kernel buffer by using copy_from_user()
     // Hint: Only one line of code is needed
-    if (copy_from_user(kernel_buffer, user_buffer, min((size_t)count, (size_t)MAX_MESSAGE_SIZE)))
+    if (copy_from_user(kernel_buffer, user_buffer, min(count, MAX_MESSAGE_SIZE)))
         return -EFAULT;
 
     pr_info("Received from user space: %s\n", kernel_buffer);
@@ -43,8 +43,8 @@ static ssize_t read_from_kernel(struct file *file, char __user *user_buffer, siz
     // Hint: Only one line of code is needed
     *ppos += to_copy;
 
-    pr_info("Read %zd bytes from kernel space starting at position %lld\n", to_copy, *ppos);
-    pr_info("Read from kernel space: %.*s\n", (int)to_copy, kernel_buffer + *ppos);
+    pr_info("Read %zd bytes from kernel space starting at position %lld\n", to_copy, *ppos - to_copy);
+    pr_info("Read from kernel space: %.*s\n", (int)to_copy, kernel_buffer + *ppos - to_copy);
 
     return to_copy;
 }
