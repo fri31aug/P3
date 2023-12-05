@@ -19,9 +19,6 @@ static ssize_t write_to_kernel(struct file *file, const char __user *user_buffer
     if (copy_from_user(kernel_buffer, user_buffer, min(count, (size_t)MAX_MESSAGE_SIZE)))
         return -EFAULT;
 
-    // Ensure string is NULL-terminated in kernel buffer
-    kernel_buffer[min(count, MAX_MESSAGE_SIZE - 1)] = '\0';
-
     pr_info("Received from user space: %s\n", kernel_buffer);
     return count;
 }
@@ -29,26 +26,28 @@ static ssize_t write_to_kernel(struct file *file, const char __user *user_buffer
 static ssize_t read_from_kernel(struct file *file, char __user *user_buffer, size_t count, loff_t *ppos)
 {
     size_t len = strlen(kernel_buffer);
+    size_t to_copy;
+
     // TODO 2: 
     // General solution: initialize retval to count
     // Bonus solution for Test Case 5: initialize retval to the minimum value between count and the length of the message
     // Hint: Only one line of code is needed
-    ssize_t retval = min(count, len - (size_t)(*ppos));
+    to_copy = min(count, len - (size_t)(*ppos));
 
     // TODO 3: copy from the kernel buffer to user buffer by using copy_to_user()
     // Hint: Only one line of code is needed
-    if (copy_to_user(user_buffer, kernel_buffer + *ppos, retval))
+    if (copy_to_user(user_buffer, kernel_buffer + *ppos, to_copy))
         return -EFAULT;
 
     // TODO 4: update the current position of the file
     // Hint: Only one line of code is needed
-    *ppos += retval;
+    *ppos += to_copy;
 
     // Log the message before updating the position pointer
-    pr_info("Read %zd bytes from kernel space starting at position %lld\n", retval, *ppos - retval);
-    pr_info("Read from kernel space: %.*s\n", (int)retval, kernel_buffer + *ppos - retval);
+    pr_info("Read %zd bytes from kernel space starting at position %lld\n", to_copy, *ppos - to_copy);
+    pr_info("Read from kernel space: %.*s\n", (int)to_copy, kernel_buffer + *ppos - to_copy);
 
-    return retval;
+    return to_copy;
 }
 
 static const struct proc_ops proc_operations = {
